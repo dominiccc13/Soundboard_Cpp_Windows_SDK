@@ -15,6 +15,7 @@
 
 ### Option 2
 1. Clone this entire repository to **C:\Users\Public**.
+2. Ensure that the full path after clone is **C:\Users\Public\cpp_soundboard\...**
 2. That's it!
 
 ## Program Setup
