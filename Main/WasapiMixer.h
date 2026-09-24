@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-inline const int g_soundbiteCount = 5;
+inline const int g_soundbiteCount = 20;
 
 class WasapiMixer {
     public:
