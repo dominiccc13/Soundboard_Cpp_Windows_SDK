@@ -9,24 +9,24 @@ std::wstring StringToWString(const std::string &str) {
 }
 
 std::vector<float> LoadWavFile(const std::string& wavPath) {
-    // 1. Open file
+    // open file
     std::ifstream file(wavPath, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file: " << wavPath << "\n";
         return {};
     }
 
-    // 2. Declare file format variables
+    // declare file format vars
     char riffId[4], formatId[4];
     uint32_t chunkSize = 0;
     
-    // 2. Declare audio variables
+    // declare audio vars
     std::vector<BYTE> rawAudioData;
     uint16_t numChannels = 2; // default to stereo
     char subchunkId[4];
     uint32_t subchunkSize = 0;
     
-    // 3. Verify and retrieve riff or wave formatting data
+    // verify and retrieve riff or wave formatting data
     file.read(riffId, 4);
     file.read(reinterpret_cast<char*>(&chunkSize), 4);
     file.read(formatId, 4);
@@ -35,7 +35,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
         return {};
     }
 
-    // 4. Get remaining file format data and file audio data & close file
+    // get remaining file format data and file audio data & close file
     while (file.read(subchunkId, 4)) {
         if (!file.read(reinterpret_cast<char*>(&subchunkSize), 4)) break;
 
@@ -65,7 +65,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
         return {};
     }
 
-    // 5. Convert raw audio data (16 bit signed integer sample) to 32 bit pcm float audio data for WASAPI and return it
+    // convert raw audio data (16 bit signed integer sample) to 32 bit pcm float audio data for WASAPI and return it
     std::vector<float> floatAudioData;
     size_t sampleCount = rawAudioData.size() / sizeof(int16_t);
     const int16_t* pcm16 = reinterpret_cast<const int16_t*>(rawAudioData.data());

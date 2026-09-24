@@ -23,4 +23,4 @@ To confirm the application is running, check Task Manager or expand the Windows 
 Left-click the system tray icon to view available soundbites and their assigned keys.
 
 * **Play Sound:** Ctrl + Shift + Alt + [Key]
-* **Exit:** Ctrl + Shift + Alt + Q (Or right-click the system tray icon and click Exit, or end the process in Task Manager.)
+* **Exit:** Ctrl + Shift + Alt + P (Or right-click the system tray icon and click Exit, or end the process in Task Manager.)

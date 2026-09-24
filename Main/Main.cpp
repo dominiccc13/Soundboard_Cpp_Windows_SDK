@@ -2,11 +2,6 @@
 #include "WasapiMixer.h"
 #include "Utils.h"
 #include "Tray.h"
-#include <windows.h>
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <array>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "ole32.lib")
 

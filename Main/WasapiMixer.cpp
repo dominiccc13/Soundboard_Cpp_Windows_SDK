@@ -5,7 +5,7 @@ WasapiMixer::~WasapiMixer() {
 }
 
 void WasapiMixer::LoadSoundbite(int index, const std::vector<float>& floatPcmData) {
-    // Load soundbites into memory and reset read index
+    // load soundbites into memory
     if (index >= 0 && index < g_soundbiteCount) {
         wavBuffers[index] = floatPcmData;
         wavReadIndex.store(0);
@@ -13,7 +13,7 @@ void WasapiMixer::LoadSoundbite(int index, const std::vector<float>& floatPcmDat
 }
 
 void WasapiMixer::TriggerSoundbite(int index) {
-    // Add soundbite index to wavBufferIndex and set variables to trigger reading
+    // add soundbite index to wavBufferIndex and set variables to trigger reading
     if (index < 0 || index >= g_soundbiteCount) return;
     wavBufferIndex.store(index);
     wavReadIndex.store(0);
@@ -25,7 +25,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
     CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, IID_PPV_ARGS(&enumerator));
     if (!enumerator) return false;
 
-    // 1. Get capture device (microphone) 
+    // 1. get system default capture device  
     IMMDevice* micDevice = nullptr;
     enumerator->GetDefaultAudioEndpoint(eCapture, eConsole, &micDevice);
     if (!micDevice) {
@@ -34,7 +34,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
         return false;
     }
 
-    // 2. Get render device (vb-cable)
+    // 2. get render device (must be vb-cable's device: "CABLE Output")
     IMMDeviceCollection* collection = nullptr;
     IMMDevice* renderDevice = nullptr;
     enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &collection);
@@ -77,7 +77,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
         return false;
     }
 
-    // 3. Activate capture client and retrieve native capture format
+    // 3. activate capture client and get capture format
     micDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&captureAudioClient);
     micDevice->Release();
     if (!captureAudioClient) return false;
@@ -107,7 +107,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
 
     captureAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&captureClient);
 
-    // 4. Activate render client and retrieve native render format
+    // 4. activate render client and get render format
     renderDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&renderAudioClient);
     renderDevice->Release();
     if (!renderAudioClient) return false;
@@ -133,7 +133,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
 
     renderAudioClient->GetService(__uuidof(IAudioRenderClient), (void**)&renderClient);
 
-    // 5. Start audio threads and return
+    // 5. start everything, return
     isRunning.store(true);
     captureAudioClient->Start();
     renderAudioClient->Start();
@@ -170,6 +170,8 @@ void WasapiMixer::MixLoop() {
     UINT32 bufferFrameCount = 0;
     UINT32 numPaddingFrames = 0;
 
+    const int isStereo = (captureChannels >= 2) ? 1 : 0;
+    const float effectiveMicGain = (isStereo) ? micGain.load(std::memory_order_relaxed) : (micGain.load(std::memory_order_relaxed) * .7071f);
     renderAudioClient->GetBufferSize(&bufferFrameCount);
 
     while (isRunning.load()) {
@@ -177,14 +179,14 @@ void WasapiMixer::MixLoop() {
         captureClient->GetNextPacketSize(&nextPacketSize);
 
         while (nextPacketSize > 0) {
-            // 1. Fetch captured microphone buffer
+            // 1. get microphone input buffer
             captureClient->GetBuffer(&capData, &capNumFrames, &flags, NULL, NULL);
 
-            // 2. Query available space in output render buffer
+            // 2. get available space in output render buffer
             renderAudioClient->GetCurrentPadding(&numPaddingFrames);
             UINT32 availableRenderFrames = bufferFrameCount - numPaddingFrames;
 
-            // wait 1ms instead of dropping packets if buffer is full
+            // wait 1 ms to avoid dropping packets on full buffer
             if (availableRenderFrames < capNumFrames) {
                 captureClient->ReleaseBuffer(capNumFrames);
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -192,7 +194,7 @@ void WasapiMixer::MixLoop() {
                 continue;
             }
 
-            // 3. Lock output render buffer
+            // 3. lock output render buffer
             renderClient->GetBuffer(capNumFrames, &renData);
 
             if (renData) {
@@ -204,7 +206,6 @@ void WasapiMixer::MixLoop() {
                 const UINT32 capChannels = captureChannels; 
                 const UINT32 renChannels = renderChannels; 
 
-                float mGain = micGain.load(std::memory_order_relaxed);
                 float wGain = wavGain.load(std::memory_order_relaxed);
 
                 bool mixingWav = isPlayingWav.load(std::memory_order_relaxed);
@@ -221,16 +222,16 @@ void WasapiMixer::MixLoop() {
                 }
 
                 for (UINT32 frame = 0; frame < capNumFrames; ++frame) {
-                    // 1. EXTRACT MIC SAMPLES (4 channels -> 2 channels)
-                    // Calculate exact byte offsets using respective channel counts
+                    // 1. extract mic samples 
+                    // get exact byte offsets using channel counts
                     UINT32 micFrameOffset = frame * capChannels; 
                     UINT32 outFrameOffset = frame * renChannels;
 
-                    // Capture channels 0 & 1 for Left & Right
-                    float micL = micSamples[micFrameOffset + 0] * mGain;
-                    float micR = micSamples[micFrameOffset + 1] * mGain;
+                    // capture channels 0 & 1 for left & right
+                    float micL = micSamples[micFrameOffset + 0] * effectiveMicGain;
+                    float micR = micSamples[micFrameOffset + isStereo] * effectiveMicGain;
 
-                    // 2. EXTRACT SOUNDBITE SAMPLES (2 channels -> 2 channels)
+                    // 2. extract soundbite samples 
                     float wavL = 0.0f;
                     float wavR = 0.0f;
 
@@ -238,7 +239,7 @@ void WasapiMixer::MixLoop() {
                         if (currentWavIdx + 1 < currentBuffer->size()) {
                             wavL = (*currentBuffer)[currentWavIdx]     * wGain;
                             wavR = (*currentBuffer)[currentWavIdx + 1] * wGain;
-                            currentWavIdx += 2; // Advance soundbite by 2 float samples (1 frame)
+                            currentWavIdx += 2; // move soundbite forward by 2 float samples (1 frame)
                         } else {
                             // end of soundbite
                             mixingWav = false;
@@ -247,11 +248,11 @@ void WasapiMixer::MixLoop() {
                         }
                     }
 
-                    // 3. Mix and clip to prevent distortion
+                    // 3. mix and clip to prevent distortion
                     float finalL = micL + wavL;
                     float finalR = micR + wavR;
 
-                    // Hard clip between -1.0f and 1.0f
+                    // hard clip between -1.0f and 1.0f
                     outSamples[outFrameOffset + 0] = (finalL > 1.0f) ? 1.0f : ((finalL < -1.0f) ? -1.0f : finalL);
                     outSamples[outFrameOffset + 1] = (finalR > 1.0f) ? 1.0f : ((finalR < -1.0f) ? -1.0f : finalR);
                 }

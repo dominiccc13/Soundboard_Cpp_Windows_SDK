@@ -74,7 +74,7 @@ void TrayLoop() {
     // initialize and load tray icon
     nid.cbSize = sizeof(NOTIFYICONDATA);
     nid.hWnd = hwnd;
-    nid.uID = 1; // Unique ID for this icon
+    nid.uID = 1; 
     nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     nid.uCallbackMessage = WM_TRAYICON;
     nid.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MYICON));
