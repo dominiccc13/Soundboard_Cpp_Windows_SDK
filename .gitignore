@@ -5,4 +5,6 @@ unused/
 Resources/logo/
 Resources/soundbites/
 Resources/toggleListen.ps1
-my-notes
+Resources/my-notes
+Build/
+!Build/soundboard.exe
