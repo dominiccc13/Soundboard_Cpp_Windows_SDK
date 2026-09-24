@@ -5,7 +5,7 @@
 
 int main() {
     // 1. Initialize and declare variables
-    std::string soundbiteBasePath = "C:\\coding\\cpp_soundboard\\Resources\\soundbites\\formatted\\";
+    std::string soundbiteBasePath = "C:\\Users\\Public\\cpp_soundboard\\Resources\\Test_Soundbites\\";
     std::string soundbitePaths[g_soundbiteCount] = {
         "mbappe-special.wav", "audrey-special.wav", "florida.wav", "300-million.wav", "trump-winning.wav",
         "chew.wav", "grenade.wav", "kanye-never-know.wav", "follow-god.wav", "Turnt-1.wav",

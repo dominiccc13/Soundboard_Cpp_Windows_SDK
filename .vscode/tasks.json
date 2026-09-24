@@ -2,34 +2,9 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-<<<<<<< HEAD
 			"type": "shell",
 			"label": "C/C++: cmake build active file with cl.exe",
 			"command": "cmake -S . -B build && cmake --build build",
-=======
-			"type": "cppbuild",
-			"label": "C/C++: cl.exe build active file",
-			"command": "cl.exe",
-			"args": [
-				"/Zi",
-				"/EHsc",
-				"/nologo",
-				"/std:c++17",
-				"/Fe${workspaceFolder}\\soundboard.exe",
-				"/Fo${workspaceFolder}\\",
-				"/Fd${workspaceFolder}\\",
-				"${workspaceFolder}\\Main\\Main.cpp",
-				"${workspaceFolder}\\Main\\WasapiMixer.cpp",
-				"${workspaceFolder}\\Main\\Utils.cpp",
-				"${workspaceFolder}\\Main\\Tray.cpp",
-				"${workspaceFolder}\\Resources\\resource.res",
-				"ole32.lib",
-				"user32.lib",
-				"/link",
-				"/SUBSYSTEM:WINDOWS",
-				"/ENTRY:mainCRTStartup"
-			],
->>>>>>> 157a26d (reorganized folder structure)
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},

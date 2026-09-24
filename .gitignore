@@ -7,10 +7,6 @@ Resources/logo/
 Resources/soundbites/
 Resources/toggleListen.ps1
 Resources/my-notes
-<<<<<<< HEAD
 build/*
 !build/soundboard.exe
 recent_Build/
-=======
-Build/*
->>>>>>> 157a26d (reorganized folder structure)
