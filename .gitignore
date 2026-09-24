@@ -7,4 +7,3 @@ Resources/soundbites/
 Resources/toggleListen.ps1
 Resources/my-notes
 Build/*
-!Build/soundboard.exe
