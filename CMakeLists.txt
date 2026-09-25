@@ -38,8 +38,12 @@ target_sources(Utils
             Main/Utils.h
 )
 
-add_executable(soundboard WIN32
+add_executable(soundboard
     Main/Main.cpp
+)
+
+set_target_properties(soundboard PROPERTIES
+    WIN32_EXECUTABLE TRUE
 )
 
 target_link_libraries(soundboard
