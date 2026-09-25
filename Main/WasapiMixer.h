@@ -12,7 +12,7 @@
 #include <string>
 // #pragma comment(lib, "ole32.lib")
 
-inline const int g_soundbiteCount = 20;
+inline const int g_soundbiteCount = 5;
 
 class WasapiMixer {
     public:
