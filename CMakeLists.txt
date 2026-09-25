@@ -38,7 +38,7 @@ target_sources(Utils
             Main/Utils.h
 )
 
-add_executable(soundboard
+add_executable(soundboard WIN32
     Main/Main.cpp
 )
 
