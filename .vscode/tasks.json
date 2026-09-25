@@ -4,11 +4,7 @@
 		{
 			"type": "shell",
 			"label": "C/C++: cmake build active file with cl.exe",
-			"command": "cmake",
-			"args": [
-				"--build",
-				"build"
-			],
+			"command": "cmake -S . -B build && cmake --build build",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
