@@ -10,6 +10,7 @@
 #include <thread>
 #include <iostream>
 #include <string>
+#pragma comment(lib, "ole32.lib")
 
 inline const int g_soundbiteCount = 20;
 

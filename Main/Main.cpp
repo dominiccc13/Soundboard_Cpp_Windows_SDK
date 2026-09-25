@@ -2,8 +2,6 @@
 #include "WasapiMixer.h"
 #include "Utils.h"
 #include "Tray.h"
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "ole32.lib")
 
 int main() {
     // 1. Initialize and declare variables

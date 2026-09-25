@@ -1,6 +1,4 @@
 #include "Tray.h"
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "shell32.lib")
 #define WM_TRAYICON (WM_USER + 1)
 #define ID_TRAY_EXIT 1001
 
