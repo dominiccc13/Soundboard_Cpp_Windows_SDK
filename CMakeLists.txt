@@ -40,6 +40,7 @@ target_sources(Utils
 
 add_executable(soundboard
     Main/Main.cpp
+    Resources/resource.rc
 )
 
 set_target_properties(soundboard PROPERTIES
