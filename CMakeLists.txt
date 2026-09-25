@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25...3.50)
 project(Soundboard CXX)
 
-add_library(Tray)
+add_library(Tray STATIC)
 target_sources(Tray
     PRIVATE
         Main/Tray.cpp
@@ -10,8 +10,10 @@ target_sources(Tray
         FILES
             Main/Tray.h
 )
+target_link_libraries(Tray PRIVATE user32)
+target_link_libraries(Tray PRIVATE shell32)
 
-add_library(WasapiMixer)
+add_library(WasapiMixer STATIC)
 target_sources(WasapiMixer
     PRIVATE
         Main/WasapiMixer.cpp
@@ -20,8 +22,9 @@ target_sources(WasapiMixer
         FILES
             Main/WasapiMixer.h
 )
+target_link_libraries(WasapiMixer PRIVATE ole32)
 
-add_library(Utils)
+add_library(Utils STATIC)
 target_sources(Utils
     PRIVATE
         Main/Utils.cpp

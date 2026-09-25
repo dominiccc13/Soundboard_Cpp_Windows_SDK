@@ -2,30 +2,15 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "cppbuild",
-			"label": "C/C++: cl.exe build active file",
-			"command": "cl.exe",
+			"type": "shell",
+			"label": "C/C++: cmake build active file with cl.exe",
+			"command": "cmake",
 			"args": [
-				"/Zi",
-				"/EHsc",
-				"/nologo",
-				"/std:c++17",
-				"/Fe${workspaceFolder}\\Build\\soundboard.exe",
-				"/Fo${workspaceFolder}\\Build\\",
-				"/Fd${workspaceFolder}\\Build\\",
-				"${workspaceFolder}\\Main\\Main.cpp",
-				"${workspaceFolder}\\Main\\WasapiMixer.cpp",
-				"${workspaceFolder}\\Main\\Utils.cpp",
-				"${workspaceFolder}\\Main\\Tray.cpp",
-				"${workspaceFolder}\\Resources\\resource.res",
-				"ole32.lib",
-				"user32.lib",
-				"/link",
-				"/SUBSYSTEM:WINDOWS",
-				"/ENTRY:mainCRTStartup"
+				"--build",
+				"build"
 			],
 			"options": {
-				"cwd": "${workspaceFolder}"
+				"cwd": "${fileDirname}"
 			},
 			"problemMatcher": [
 				"$msCompile"
@@ -34,7 +19,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"detail": "compiler: cl.exe"
+			"detail": "compiler: cl.exe through cmake"
 		}
 	]
 }
