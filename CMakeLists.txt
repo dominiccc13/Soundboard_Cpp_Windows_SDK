@@ -46,6 +46,10 @@ set_target_properties(soundboard PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+if(MSVC)
+    target_link_options(soundboard PRIVATE /ENTRY:mainCRTStartup)
+endif()
+
 target_link_libraries(soundboard
     PRIVATE
         Tray
