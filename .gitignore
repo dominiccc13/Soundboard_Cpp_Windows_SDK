@@ -8,5 +8,5 @@ Resources/soundbites/
 Resources/toggleListen.ps1
 Resources/my-notes
 build/*
-!build/soundboard.exe
+!build/Debug/soundboard.exe
 recent_Build/
