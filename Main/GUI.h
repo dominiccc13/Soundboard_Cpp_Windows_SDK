@@ -16,23 +16,22 @@
 #include <QMenu>
 #include <QCloseEvent>
 
-class SoundWorker : public QObject {
+class Soundboard : public QObject {
     Q_OBJECT
 public:
-    SoundWorker(QObject *parent = nullptr);
-    ~SoundWorker();
+    Soundboard(QObject *parent = nullptr);
+    ~Soundboard();
 
 public slots:
     void setBasePath(const QString &path);
     void updateSoundbiteFile(int index, const QString &filename);
-    void startEngine();
-    void stopEngine();
+    void startSoundboard();
+    void stopSoundboard();
 
 signals:
-    void engineStopped();
+    void soundboardStopped();
 
 private:
-    std::atomic<bool> running;
     QMutex mutex;
     QString basePath;
     std::vector<std::string> soundbiteFiles;
@@ -48,7 +47,7 @@ public:
 signals:
     void requestSetBasePath(const QString &path);
     void requestUpdateSoundbite(int index, const QString &filename);
-    void requestStartEngine();
+    void requestStartSoundboard();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -57,39 +56,30 @@ private slots:
     void onBrowseClicked();
     void onAddRowClicked();
     void onChangeSoundbiteClicked(int row);
-    void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
+    // void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     void addRow(char hotkey, const QString &filename);
 
     QWidget *centralWidget;
     QVBoxLayout *mainLayout;
-    
     QHBoxLayout *topLayout;
     QLineEdit *pathLineEdit;
     QPushButton *browseButton;
-
     QVBoxLayout *rowsLayout;
     QWidget *rowsContainer;
     QScrollArea *scrollArea;
-
     QPushButton *addRowButton;
-
-    QString hotkeySequence;
-    int currentRowIndex;
-
-    struct SoundRow {
+    
+    struct SoundbiteRow {
         QLabel *hotkeyLabel;
         QLineEdit *fileLineEdit;
         QPushButton *changeButton;
     };
-
-    std::vector<SoundRow> soundRows;
-
-    QThread *workerThread;
-    SoundWorker *soundWorker;
-
-    // System Tray integration
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayMenu;
+    
+    std::vector<SoundbiteRow> soundbiteRows;
+    QString hotkeys;
+    int currentRowIndex;
+    QThread *soundboardThread;
+    Soundboard *soundboard;
 };

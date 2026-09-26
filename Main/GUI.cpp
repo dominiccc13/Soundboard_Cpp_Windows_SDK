@@ -6,18 +6,18 @@
 #include <QStyle>
 #include <QTimer>
 
-SoundWorker::SoundWorker(QObject *parent) : QObject(parent), running(false) {}
+Soundboard::Soundboard(QObject *parent) : QObject(parent) {}
 
-SoundWorker::~SoundWorker() {
-    stopEngine();
+Soundboard::~Soundboard() {
+    stopSoundboard();
 }
 
-void SoundWorker::setBasePath(const QString &path) {
+void Soundboard::setBasePath(const QString &path) {
     QMutexLocker locker(&mutex);
     basePath = path;
 }
 
-void SoundWorker::updateSoundbiteFile(int index, const QString &filename) {
+void Soundboard::updateSoundbiteFile(int index, const QString &filename) {
     QMutexLocker locker(&mutex);
     if (index >= 0 && index < static_cast<int>(soundbiteFiles.size())) {
         soundbiteFiles[index] = filename.toStdString();
@@ -29,19 +29,15 @@ void SoundWorker::updateSoundbiteFile(int index, const QString &filename) {
     }
 }
 
-void SoundWorker::startEngine() {
-    if (running) return;
-    running = true;
-
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
+void Soundboard::startSoundboard() {
     WasapiMixer mixer;
     int soundbiteIndex = -1;
+    CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
     {
         QMutexLocker locker(&mutex);
         std::string bPath = basePath.toStdString();
-        if (bPath.empty()) bPath = "C:\\Users\\Public\\cpp_soundboard\\Resources\\Test_Soundbites\\";
+        if (bPath.empty()) bPath = "C:\\Users\\Public\\cpp_Soundboard\\Resources\\Test_Soundbites\\";
         if (bPath.back() != '\\' && bPath.back() != '/') bPath += "\\";
 
         for (size_t i = 0; i < soundbiteFiles.size(); i++) {
@@ -55,7 +51,7 @@ void SoundWorker::startEngine() {
     if (!mixer.Start(L"CABLE Input")) {
         std::cerr << "Failed to start WasapiMixer! Make sure VB-Cable is active.\n";
         CoUninitialize();
-        running = false;
+        g_running = false;
         return;
     }
 
@@ -72,7 +68,7 @@ void SoundWorker::startEngine() {
 
     const std::string hotkeys = "1234567890qwertyuioasdfghjklzxcvbnm";
 
-    while (running.load() && g_running.load()) {
+    while (g_running.load()) {
         bool ctrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
         bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
         bool alt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
@@ -85,7 +81,6 @@ void SoundWorker::startEngine() {
             }
 
             if (pressedKey == 'Q' || pressedKey == 'q') {
-                running.store(false);
                 g_running.store(false);
                 break;
             }
@@ -115,46 +110,42 @@ void SoundWorker::startEngine() {
         trayThread.join();
     }
 
-    emit engineStopped();
+    emit soundboardStopped();
 }
 
-void SoundWorker::stopEngine() {
-    running.store(false);
+void Soundboard::stopSoundboard() {
+    g_running.store(false);
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), currentRowIndex(0) {
-    hotkeySequence = "1234567890qwertyuioasdfghjklzxcvbnm";
+    hotkeys = "1234567890qwertyuioasdfghjklzxcvbnm";
 
+    // ui elements
     centralWidget = new QWidget(this);
     mainLayout = new QVBoxLayout(centralWidget);
-
     topLayout = new QHBoxLayout();
     QLabel *pathLabel = new QLabel("Soundbites Dir:", this);
     pathLineEdit = new QLineEdit(this);
-    pathLineEdit->setText("C:\\Users\\Public\\cpp_soundboard\\Resources\\Test_Soundbites\\");
+    pathLineEdit->setText("C:\\Users\\Public\\cpp_Soundboard\\Resources\\Test_Soundbites\\");
     browseButton = new QPushButton("Browse...", this);
-
     topLayout->addWidget(pathLabel);
     topLayout->addWidget(pathLineEdit);
     topLayout->addWidget(browseButton);
     mainLayout->addLayout(topLayout);
-
     rowsContainer = new QWidget(this);
     rowsLayout = new QVBoxLayout(rowsContainer);
     rowsLayout->setAlignment(Qt::AlignTop);
-
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setWidget(rowsContainer);
     mainLayout->addWidget(scrollArea);
-
     addRowButton = new QPushButton("Add Row", this);
     mainLayout->addWidget(addRowButton);
-
     setCentralWidget(centralWidget);
     resize(550, 400);
     setWindowTitle("Qt 6.11.2 Soundboard Manager");
 
+    // instantiate tray double click method
     g_OnTrayDoubleClick = [this]() {
         QMetaObject::invokeMethod(this, [this]() {
             show();
@@ -163,67 +154,51 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), currentRowIndex(0
             activateWindow();
         }, Qt::QueuedConnection);
     };
-
-    QTimer *quitChecker = new QTimer(this);
-    connect(quitChecker, &QTimer::timeout, this, [this]() {
-        if (!g_running.load()) {
-            QCoreApplication::quit();
-        }
-    });
-    quitChecker->start(100);
-
-    // Connect GUI signals
+    
+    // connect signals
     connect(browseButton, &QPushButton::clicked, this, &MainWindow::onBrowseClicked);
     connect(addRowButton, &QPushButton::clicked, this, &MainWindow::onAddRowClicked);
     connect(pathLineEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
         emit requestSetBasePath(text);
     });
+    QTimer *quitChecker = new QTimer(this);
+    connect(quitChecker, &QTimer::timeout, this, [this]() {
+        if (!g_running.load()) QCoreApplication::quit();
+    });
+    quitChecker->start(100);
 
-    // Setup Background QThread and Worker
-    workerThread = new QThread(this);
-    soundWorker = new SoundWorker();
-    soundWorker->moveToThread(workerThread);
+    // instantiate and connect soundboard on background qthread "soundboardThread"
+    soundboardThread = new QThread(this);
+    soundboard = new Soundboard();
+    soundboard->moveToThread(soundboardThread);
+    connect(soundboardThread, &QThread::finished, soundboard, &QObject::deleteLater);
+    connect(this, &MainWindow::requestSetBasePath, soundboard, &Soundboard::setBasePath);
+    connect(this, &MainWindow::requestUpdateSoundbite, soundboard, &Soundboard::updateSoundbiteFile);
+    connect(this, &MainWindow::requestStartSoundboard, soundboard, &Soundboard::startSoundboard);
+    soundboardThread->start();
 
-    connect(workerThread, &QThread::finished, soundWorker, &QObject::deleteLater);
-    connect(this, &MainWindow::requestSetBasePath, soundWorker, &SoundWorker::setBasePath);
-    connect(this, &MainWindow::requestUpdateSoundbite, soundWorker, &SoundWorker::updateSoundbiteFile);
-    connect(this, &MainWindow::requestStartEngine, soundWorker, &SoundWorker::startEngine);
-
-    workerThread->start();
-
-    // Initialize with 5 default rows
+    // initialize with default rows
     QStringList defaultFiles = {"1.wav", "2.wav", "3.wav", "4.wav", "5.wav"};
     for (int i = 0; i < 5; ++i) {
-        if (currentRowIndex < hotkeySequence.length()) {
+        if (currentRowIndex < hotkeys.length()) {
             QString filename = (i < defaultFiles.size()) ? defaultFiles[i] : "";
-            addRow(hotkeySequence[currentRowIndex].toLatin1(), filename);
+            addRow(hotkeys[currentRowIndex].toLatin1(), filename);
         }
     }
 
     emit requestSetBasePath(pathLineEdit->text());
-    emit requestStartEngine();
+    emit requestStartSoundboard();
 }
 
 MainWindow::~MainWindow() {
-    soundWorker->stopEngine();
-    workerThread->quit();
-    workerThread->wait();
+    soundboard->stopSoundboard();
+    soundboardThread->quit();
+    soundboardThread->wait();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     hide();
     event->ignore();
-}
-
-void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason) {
-    if (reason == QSystemTrayIcon::DoubleClick) {
-        if (isVisible()) {
-            hide();
-        } else {
-            show();
-            activateWindow();
-        }
-    }
 }
 
 void MainWindow::onBrowseClicked() {
@@ -235,8 +210,8 @@ void MainWindow::onBrowseClicked() {
 }
 
 void MainWindow::onAddRowClicked() {
-    if (currentRowIndex < hotkeySequence.length()) {
-        addRow(hotkeySequence[currentRowIndex].toLatin1(), "");
+    if (currentRowIndex < hotkeys.length()) {
+        addRow(hotkeys[currentRowIndex].toLatin1(), "");
     }
 }
 
@@ -246,7 +221,7 @@ void MainWindow::onChangeSoundbiteClicked(int row) {
                                                    startDir, "WAV Files (*.wav)");
     if (!filePath.isEmpty()) {
         QFileInfo fileInfo(filePath);
-        soundRows[row].fileLineEdit->setText(fileInfo.fileName());
+        soundbiteRows[row].fileLineEdit->setText(fileInfo.fileName());
         emit requestUpdateSoundbite(row, fileInfo.fileName());
     }
 }
@@ -269,8 +244,8 @@ void MainWindow::addRow(char hotkey, const QString &filename) {
 
     rowsLayout->addLayout(rowLayout);
 
-    int index = static_cast<int>(soundRows.size());
-    soundRows.push_back({hotkeyLabel, fileLineEdit, changeButton});
+    int index = static_cast<int>(soundbiteRows.size());
+    soundbiteRows.push_back({hotkeyLabel, fileLineEdit, changeButton});
     currentRowIndex++;
 
     if (!filename.isEmpty()) {
@@ -281,3 +256,12 @@ void MainWindow::addRow(char hotkey, const QString &filename) {
         onChangeSoundbiteClicked(index);
     });
 }
+
+// void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason) {
+//     if (reason == QSystemTrayIcon::DoubleClick) {
+//         if (!isVisible()) {
+//             show();
+//             activateWindow();
+//         }
+//     }
+// }
