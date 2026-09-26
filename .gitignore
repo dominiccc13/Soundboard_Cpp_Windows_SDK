@@ -16,5 +16,7 @@ build/Debug/Utils.lib
 build/Debug/Utils.pdb
 build/Debug/WasapiMixer.lib
 build/Debug/WasapiMixer.pdb
+build/Debug/GUI.lib
+build/Debug/GUI.pdb
 !build/Debug/soundboard.exe
 recent_Build/

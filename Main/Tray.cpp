@@ -5,27 +5,20 @@
 LRESULT CALLBACK TrayWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_TRAYICON:
-            // left click: display soundbite keys and names
-            if (lParam == WM_LBUTTONUP) {
-                POINT pt;
-                GetCursorPos(&pt);
-                HMENU hMenu = CreatePopupMenu();
-                
-                // populate keys and names
-                for (int i = 0; i < g_soundbiteKeys.size(); i++) {
-                    AppendMenuW(hMenu, MF_STRING | MF_DISABLED, 0, g_soundbiteNames[i].c_str());
+            if (lParam == WM_LBUTTONDBLCLK) {
+                if (g_OnTrayDoubleClick) {
+                    g_OnTrayDoubleClick(); // Triggers the GUI window to show/open safely
                 }
-                
-                // dismisses menu when clicking away
-                SetForegroundWindow(hwnd); 
-                TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN | TPM_NONOTIFY, pt.x, pt.y, 0, hwnd, NULL);
-                DestroyMenu(hMenu);
             }
             // right click: display exit and handle exit event
             else if (lParam == WM_RBUTTONUP) {
                 POINT pt;
                 GetCursorPos(&pt);
                 HMENU hMenu = CreatePopupMenu();
+
+                for (int i = 0; i < g_soundbiteKeys.size(); i++) {
+                    AppendMenuW(hMenu, MF_STRING | MF_DISABLED, 0, g_soundbiteNames[i].c_str());
+                }
 
                 AppendMenuW(hMenu, MF_STRING, ID_TRAY_EXIT, L"Exit");
                 
@@ -65,6 +58,7 @@ void TrayLoop() {
     wc.lpfnWndProc = TrayWindowProc;
     wc.hInstance = GetModuleHandle(NULL);
     wc.lpszClassName = CLASS_NAME;
+    wc.style = CS_DBLCLKS;
     RegisterClassW(&wc);
 
     HWND hwnd = CreateWindowExW(0, CLASS_NAME, L"Soundboard App", 0, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);

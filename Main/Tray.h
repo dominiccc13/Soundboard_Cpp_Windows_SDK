@@ -5,12 +5,12 @@
 #include <vector>
 #include <string>
 #include <array>
-// #pragma comment(lib, "user32.lib")
-// #pragma comment(lib, "shell32.lib")
+#include <functional>
 #define WM_TRAYICON (WM_USER + 1)
 #define ID_TRAY_EXIT 1001
 #define IDI_MYICON 1
 
+inline std::function<void()> g_OnTrayDoubleClick = nullptr;
 inline std::vector<std::wstring> g_soundbiteKeys = {
     L"1 : ", L"2 : ", L"3 : ", L"4 : ", L"5 : ",
     L"Q : ", L"W : ", L"E : ", L"R : ", L"T : ",

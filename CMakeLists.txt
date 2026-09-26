@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(Qt6 6.11 REQUIRED COMPONENTS Core Widgets)
+
 add_library(Tray STATIC)
 target_sources(Tray
     PRIVATE
@@ -38,6 +40,18 @@ target_sources(Utils
             Main/Utils.h
 )
 
+add_library(GUI STATIC)
+target_sources(GUI
+    PRIVATE
+        Main/GUI.cpp
+    PUBLIC
+        FILE_SET HEADERS
+        FILES
+            Main/GUI.h
+)
+target_link_libraries(GUI PRIVATE Qt6::Core Qt6::Widgets)
+set_target_properties(GUI PROPERTIES AUTOMOC ON)
+
 add_executable(soundboard
     Main/Main.cpp
     Resources/resource.rc
@@ -56,4 +70,7 @@ target_link_libraries(soundboard
         Tray
         WasapiMixer
         Utils
+        GUI
+        Qt6::Core
+        Qt6::Widgets
 )
