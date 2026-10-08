@@ -27,7 +27,7 @@ To enable live feedback:
 
 ## Launching
 1. Ensure that you have followed installation option 1 or 2 instructions carefully.
-1. Double-click **soundboard.exe**. 
+1. Navigate to build/Debug. Double-click **soundboard.exe**. 
 
 To confirm the application is running, check Task Manager or expand the Windows system tray region in your taskbar.
 
