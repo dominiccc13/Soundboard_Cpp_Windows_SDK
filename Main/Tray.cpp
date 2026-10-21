@@ -7,7 +7,7 @@ LRESULT CALLBACK TrayWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         case WM_TRAYICON:
             if (lParam == WM_LBUTTONDBLCLK) {
                 if (g_OnTrayDoubleClick) {
-                    g_OnTrayDoubleClick(); // Triggers the GUI window to show/open safely
+                    g_OnTrayDoubleClick(); // triggers the GUI window to oepn
                 }
             }
             // right click: display exit and handle exit event
