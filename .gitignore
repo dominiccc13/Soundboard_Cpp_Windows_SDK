@@ -1,5 +1,5 @@
 .vscode/
-build/
+build-release/
 Resources/logo
 Resources/Soundbites
 Resources/my-notes
