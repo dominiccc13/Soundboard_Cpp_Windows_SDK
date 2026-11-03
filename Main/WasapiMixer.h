@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-inline const int g_soundbiteCount = 20;
+inline const int g_soundbiteCount = 5;
 
 class WasapiMixer {
     public:
@@ -39,7 +39,7 @@ private:
     std::vector<float> wavBuffers[g_soundbiteCount];
     
     std::atomic<float> micGain{1.5f};
-    std::atomic<float> wavGain{0.4f};
+    std::atomic<float> wavGain{0.3f};
 
     UINT32 captureSampleRate = 0;
     UINT32 captureChannels = 0;
