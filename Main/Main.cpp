@@ -13,6 +13,18 @@ std::wstring StringToWString(const std::string &str) {
     return wstrTo;
 }
 
+static std::string ExeDirUtf8() {
+    wchar_t buf[MAX_PATH];
+    DWORD n = GetModuleFileNameW(NULL, buf, MAX_PATH);
+    if (n == 0 || n >= MAX_PATH) return std::string();
+    std::wstring dir(buf, n);
+    dir.resize(dir.find_last_of(L'\\') + 1);
+    int len = WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), (int)dir.size(), NULL, 0, NULL, NULL);
+    std::string out(len, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), (int)dir.size(), &out[0], len, NULL, NULL);
+    return out;
+}
+
 std::vector<float> LoadWavFile(const std::string& wavPath) {
     // open file
     std::ifstream file(wavPath, std::ios::binary);
@@ -55,6 +67,11 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
             }
         }
         else if (memcmp(subchunkId, "data", 4) == 0) {
+            std::streampos pos = file.tellg();
+            file.seekg(0, std::ios::end);
+            std::streamoff remaining = file.tellg() - pos;
+            file.seekg(pos);
+            if (subchunkSize > static_cast<uint64_t>(remaining)) subchunkSize = static_cast<uint32_t>(remaining);
             rawAudioData.resize(subchunkSize);
             file.read(reinterpret_cast<char*>(rawAudioData.data()), subchunkSize);
             break;
@@ -111,7 +128,8 @@ char GetPressedAlphaNumericKey() {
 
 int main() {
     // 1. Initialize and declare variables
-    std::string soundbiteBasePath = "C:\\code\\soundboard\\Resources\\TestSoundbites\\";
+    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
+    std::string soundbiteBasePath = ExeDirUtf8() + "Soundbites\\";
     std::string soundbitePaths[g_soundbiteCount] = {
         "1.wav", "2.wav", "3.wav", "4.wav", "5.wav"
     };
