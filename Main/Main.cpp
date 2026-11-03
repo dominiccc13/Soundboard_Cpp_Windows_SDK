@@ -54,7 +54,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
         if (!converted.empty()) return converted;
         else {
             std::cerr << "Line 56 Main::LoadWavFile Error: Failed to convert file." << "\n";
-            return;
+            return {};
         }
     }
 
@@ -137,7 +137,7 @@ int main() {
     SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
     std::string soundbiteBasePath = ExeDirUtf8() + "Soundbites\\";
     std::string soundbitePaths[g_soundbiteCount] = {
-        "1.wav", "2.wav", "3.wav", "4.wav", "5.wav"
+        "1.wav", "2.wav", "3.wav", "4.mp3", "5.wav"
     };
     WasapiMixer mixer;
     int soundbiteIndex = -1;

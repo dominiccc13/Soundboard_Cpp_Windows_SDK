@@ -96,7 +96,7 @@ set_target_properties(soundboard PROPERTIES
 )
 
 if(MSVC)
-    target_link_options(soundboard PRIVATE /SUBSYSTEM:CONSOLE)
+    target_link_options(soundboard PRIVATE /ENTRY:mainCRTStartup)
 endif()
 
 target_link_libraries(soundboard
