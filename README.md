@@ -12,6 +12,9 @@ To enable live feedback:
 2. Set your primary recording device to **CABLE Output**.
 3. Double-click your new primary recording device and go to the **Listen** tab and check **Listen to this device**.
 
+To add sounds:
+1. Export your soundbites as **.wav** file types with 2 channels, 16 bit depth, and 48.000 kHz sample rate.
+
 ## Launching
 1. Download soundboard.zip from the GitHub release in this repository.
 2. Unzip soundboard.zip using 7Zip or another tool.
