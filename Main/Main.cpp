@@ -30,7 +30,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     // open file
     std::ifstream file(wavPath, std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file: " << wavPath << "\n";
+        std::cerr << "Line 33 Main::LoadWavFile Error: Could not open file: " << wavPath << "\n";
         return {};
     }
 
@@ -52,6 +52,10 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
         file.close();
         std::vector<float> converted = ConvertAudioFile(wavPath);
         if (!converted.empty()) return converted;
+        else {
+            std::cerr << "Line 56 Main::LoadWavFile Error: Failed to convert file." << "\n";
+            return;
+        }
     }
 
     // get remaining file format data and file audio data & close file
@@ -85,7 +89,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     file.close();
 
     if (rawAudioData.empty()) {
-        std::cerr << "Error: Data payload empty in: " << wavPath << "\n";
+        std::cerr << "Line 92 Main::LoadWavFile Error: Data payload empty in: " << wavPath << "\n";
         return {};
     }
 
@@ -146,7 +150,7 @@ int main() {
 
     // 3. Start mixer background thread (captures Mic and routes to VB-Cable)
     if (!mixer.Start(L"CABLE Input")) {
-        std::cerr << "Failed to start WasapiMixer! Make sure VB-Cable is active.";
+        std::cerr << "Line 153 Main::Main Error: Failed to start WasapiMixer! Make sure VB-Cable is active.";
         CoUninitialize();
         system("pause");
         return -1;

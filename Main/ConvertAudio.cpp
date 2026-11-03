@@ -39,7 +39,7 @@ bool ReadWav(const std::string& path, AudioFormat& format, uint16_t& audioFormat
     // open file
     std::ifstream file(path, std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file: " << path << "\n";
+        std::cerr << "Line 42 ReadWav Error: Could not open file: " << path << "\n";
         return false;
     }
 
@@ -55,7 +55,7 @@ bool ReadWav(const std::string& path, AudioFormat& format, uint16_t& audioFormat
     file.read(reinterpret_cast<char*>(&chunkSize), 4);
     file.read(formatId, 4);
     if (!file || memcmp(riffId, "RIFF", 4) != 0 || memcmp(formatId, "WAVE", 4) != 0) {
-        std::cerr << "Error: Invalid WAV format: " << path << "\n";
+        std::cerr << "Line 58 ReadWav Error: Invalid WAV format: " << path << "\n";
         return false;
     }
 
@@ -102,7 +102,7 @@ bool ReadWav(const std::string& path, AudioFormat& format, uint16_t& audioFormat
     file.close();
 
     if (!foundFmt || (rawAudioData && !foundData)) {
-        std::cerr << "Error: Missing fmt or data chunk in: " << path << "\n";
+        std::cerr << "Line 105 ReadWav Error: Missing fmt or data chunk in: " << path << "\n";
         return false;
     }
     return true;
@@ -197,7 +197,7 @@ bool GetAudioInfo(const std::string& path, AudioFileType& type, AudioFormat& for
 
 std::vector<float> ConvertWav(const std::string& path, const AudioFormat& target) {
     if (target.channels != 1 && target.channels != 2) {
-        std::cerr << "Error: Only mono or stereo output is supported.\n";
+        std::cerr << "Line 200 ConvertWav Error: Only mono or stereo output is supported.\n";
         return {};
     }
 
@@ -208,7 +208,7 @@ std::vector<float> ConvertWav(const std::string& path, const AudioFormat& target
     if (!ReadWav(path, source, audioFormat, &rawAudioData)) return {};
     std::vector<float> samples = DecodeWavSamples(source, audioFormat, rawAudioData);
     if (samples.empty() || source.channels == 0 || source.sampleRate == 0) {
-        std::cerr << "Error: Unsupported WAV format: " << path << "\n";
+        std::cerr << "Line 211 ConvertWav Error: Unsupported WAV format: " << path << "\n";
         return {};
     }
 
@@ -248,18 +248,18 @@ std::vector<float> ConvertWav(const std::string& path, const AudioFormat& target
 
 std::vector<float> ConvertMp3(const std::string& path, const AudioFormat& target) {
     if (target.bitsPerSample != 16) {
-        std::cerr << "Error: Only 16 bit output is supported.\n";
+        std::cerr << "Line 251 ConvertMp3 Error: Only 16 bit output is supported.\n";
         return {};
     }
     MfSession mf;
     if (FAILED(mf.hr)) {
-        std::cerr << "Error: Media Foundation failed to start.\n";
+        std::cerr << "Line 256 ConvertMp3 Error: Media Foundation failed to start.\n";
         return {};
     }
 
     ComPtr<IMFSourceReader> reader;
     if (FAILED(MFCreateSourceReaderFromURL(PathToWString(path).c_str(), NULL, &reader))) {
-        std::cerr << "Error: Could not open file: " << path << "\n";
+        std::cerr << "Line 262 ConvertMp3 Error: Could not open file: " << path << "\n";
         return {};
     }
 
@@ -277,7 +277,7 @@ std::vector<float> ConvertMp3(const std::string& path, const AudioFormat& target
     pcmType->SetUINT32(MF_MT_ALL_SAMPLES_INDEPENDENT, TRUE);
     if (FAILED(reader->SetStreamSelection(FIRST_AUDIO_STREAM, TRUE)) ||
         FAILED(reader->SetCurrentMediaType(FIRST_AUDIO_STREAM, NULL, pcmType.Get()))) {
-        std::cerr << "Error: Could not decode MP3: " << path << "\n";
+        std::cerr << "Line 280 ConvertMp3 Error: Could not decode MP3: " << path << "\n";
         return {};
     }
 
@@ -304,7 +304,7 @@ std::vector<float> ConvertMp3(const std::string& path, const AudioFormat& target
     }
 
     if (floatAudioData.empty()) {
-        std::cerr << "Error: Data payload empty in: " << path << "\n";
+        std::cerr << "Line 307, ConvertMp3 Error: Data payload empty in: " << path << "\n";
     }
     return floatAudioData;
 }
@@ -313,7 +313,7 @@ std::vector<float> ConvertAudioFile(const std::string& path, const AudioFormat& 
     AudioFileType type = AudioFileType::Unknown;
     AudioFormat source;
     if (!GetAudioInfo(path, type, source)) {
-        std::cerr << "Error: Unsupported audio file: " << path << "\n";
+        std::cerr << "Line 316 ConvertAudioFile Error: Unsupported audio file: " << path << "\n";
         return {};
     }
 
