@@ -105,7 +105,7 @@ public:
         });
         connect(ok, &QPushButton::clicked, this, [this] {
             QFileInfo info(pathEdit->text());
-            if (!info.isFile() || info.suffix().compare("wav", Qt::CaseInsensitive) != 0 && info.suffix().compare("mp3", Qt::CaseInsensitive) != 0 ) {
+            if (!info.isFile() || info.suffix().compare("wav", Qt::CaseInsensitive) != 0 && info.suffix().compare("mp3", Qt::CaseInsensitive) != 0) {
                 std::cout << info.suffix().toStdString() << "\n";
                     QMessageBox::warning(this, "Soundboard", "Path must point to an existing .wav or .mp3 file.");
                 return;
