@@ -22,6 +22,12 @@
 #include <mutex>
 #include <thread>
 
+#ifdef QT_STATIC
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+Q_IMPORT_PLUGIN(QModernWindowsStylePlugin)
+#endif
+
 namespace {
 
 std::mutex g_mutex;
