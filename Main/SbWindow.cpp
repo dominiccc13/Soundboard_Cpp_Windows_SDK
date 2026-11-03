@@ -94,19 +94,20 @@ public:
         buttons->addWidget(cancel);
 
         auto* layout = new QVBoxLayout(this);
-        layout->addWidget(new QLabel("Path to .wav file:"));
+        layout->addWidget(new QLabel("Path to audio file:"));
         layout->addLayout(pathRow);
         layout->addLayout(hotkeyRow);
         layout->addLayout(buttons);
 
         connect(browse, &QPushButton::clicked, this, [this] {
-            QString file = QFileDialog::getOpenFileName(this, "Select soundbite", pathEdit->text(), "WAV files (*.wav)");
+            QString file = QFileDialog::getOpenFileName(this, "Select soundbite", pathEdit->text(), "Audio files (*.wav *.mp3)");
             if (!file.isEmpty()) pathEdit->setText(QDir::toNativeSeparators(file));
         });
         connect(ok, &QPushButton::clicked, this, [this] {
             QFileInfo info(pathEdit->text());
-            if (!info.isFile() || info.suffix().compare("wav", Qt::CaseInsensitive) != 0) {
-                QMessageBox::warning(this, "Soundboard", "Path must point to an existing .wav file.");
+            if (!info.isFile() || info.suffix().compare("wav", Qt::CaseInsensitive) != 0 && info.suffix().compare("mp3", Qt::CaseInsensitive) != 0 ) {
+                std::cout << info.suffix().toStdString() << "\n";
+                    QMessageBox::warning(this, "Soundboard", "Path must point to an existing .wav or .mp3 file.");
                 return;
             }
             accept();
