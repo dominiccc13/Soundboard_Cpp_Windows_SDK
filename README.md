@@ -13,9 +13,10 @@ To enable live feedback:
 3. Double-click your new primary recording device and go to the **Listen** tab and check **Listen to this device**.
 
 ## Launching
-1. You made need to adjust soundbiteBasePath in line 1 of the main() function in Main.cpp.
-2. Open the Build folder.
-3. Double-click soundboard.exe.
+1. Download soundboard.zip from the GitHub release in this repository.
+2. Unzip soundboard.zip using 7Zip or another tool.
+3. This will extract to the **dist** directory in the directory you unzipped in.
+4. Open **dist** and double-click **soundboard.exe**.
 
 To confirm the application is running, check Task Manager or expand the Windows system tray region in your taskbar.
 
