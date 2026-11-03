@@ -1,0 +1,3 @@
+#include "../Main/Tray.h"
+
+1 ICON "logoR.ico"

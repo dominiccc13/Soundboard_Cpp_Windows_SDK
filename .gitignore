@@ -1,0 +1,7 @@
+.vscode/
+build/
+Resources/logo
+Resources/Soundbites
+Resources/my-notes
+Resources/toggleListen.ps1
+Resources/WasapiMixerOriginal.cpp
