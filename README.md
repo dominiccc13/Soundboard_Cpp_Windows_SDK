@@ -16,7 +16,7 @@ To add sounds:
 1. Export your soundbites as **.wav** file types (uncompressed PCM) with 2 channel stereo, 16 bit depth, and 48.000 kHz sample rate (the default for CABLE Output from VB-Audio). If your soundbites are not playing normally, it is likely due to a format mismatch. 
 
 ## Launching
-1. Download VB-Cable Virtual Audio Device from VB-Audio and install it (this application has only been tested with the 64 bit new package).
+1. Download and install VB-Cable Virtual Audio Device from VB-Audio (this application has only been tested with the 64 bit new package).
 2. Download soundboard.zip from the GitHub release in this repository.
 3. Unzip soundboard.zip using 7Zip or another tool.
 4. This will extract to the **dist** directory in the directory you unzipped in.
