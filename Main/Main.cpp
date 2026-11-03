@@ -39,7 +39,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     
     // declare audio vars
     std::vector<BYTE> rawAudioData;
-    uint16_t numChannels = 2; // default to stereo
+    uint16_t numChannels = 2;
     char subchunkId[4];
     uint32_t subchunkSize = 0;
     
@@ -48,6 +48,9 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     file.read(reinterpret_cast<char*>(&chunkSize), 4);
     file.read(formatId, 4);
     if (memcmp(riffId, "RIFF", 4) != 0 || memcmp(formatId, "WAVE", 4) != 0) {
+        // TODO: convert audio file
+        // TODO: convert audio file
+        // TODO: convert audio file
         std::cerr << "Error: Invalid WAV format: " << wavPath << "\n";
         return {};
     }
@@ -139,8 +142,7 @@ int main() {
 
     // 2. Load soundbites into memory and populate global tray variables for soundbite names
     for (int i = 0; i < g_soundbiteCount; i++) {
-        std::vector<float> soundbiteData = LoadWavFile(soundbiteBasePath + soundbitePaths[i]);
-        mixer.LoadSoundbite(i, soundbiteData);  
+        mixer.LoadSoundbite(i, LoadWavFile(soundbiteBasePath + soundbitePaths[i]));  
     }
 
     // 3. Start mixer background thread (captures Mic and routes to VB-Cable)

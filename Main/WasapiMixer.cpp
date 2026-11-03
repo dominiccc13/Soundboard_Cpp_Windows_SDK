@@ -34,7 +34,7 @@ bool WasapiMixer::Start(const wchar_t* targetRenderDeviceName) {
         return false;
     }
 
-    // 2. get render device (must be vb-cable's device: "CABLE Output")
+    // 2. get render device (vb-cable: "CABLE Output")
     IMMDeviceCollection* collection = nullptr;
     IMMDevice* renderDevice = nullptr;
     enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &collection);
