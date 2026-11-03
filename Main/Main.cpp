@@ -2,6 +2,7 @@
 #include "SbWindow.h"
 #include "Tray.h"
 #include "WasapiMixer.h"
+#include "ConvertAudio.h"
 #include <iostream>
 #include <fstream>
 
@@ -48,11 +49,9 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     file.read(reinterpret_cast<char*>(&chunkSize), 4);
     file.read(formatId, 4);
     if (memcmp(riffId, "RIFF", 4) != 0 || memcmp(formatId, "WAVE", 4) != 0) {
-        // TODO: convert audio file
-        // TODO: convert audio file
-        // TODO: convert audio file
-        std::cerr << "Error: Invalid WAV format: " << wavPath << "\n";
-        return {};
+        file.close();
+        std::vector<float> converted = ConvertAudioFile(wavPath);
+        if (!converted.empty()) return converted;
     }
 
     // get remaining file format data and file audio data & close file

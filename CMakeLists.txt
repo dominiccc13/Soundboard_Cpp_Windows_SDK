@@ -75,6 +75,17 @@ target_sources(WasapiMixer
 )
 target_link_libraries(WasapiMixer PRIVATE ole32)
 
+add_library(ConvertAudio STATIC)
+target_sources(ConvertAudio
+    PRIVATE
+        Main/ConvertAudio.cpp
+    PUBLIC
+        FILE_SET HEADERS
+        FILES
+            Main/ConvertAudio.h
+)
+target_link_libraries(ConvertAudio PRIVATE ole32 mfplat mfreadwrite mfuuid)
+
 add_executable(soundboard
     Main/Main.cpp
     Resources/resource.rc
@@ -93,6 +104,7 @@ target_link_libraries(soundboard
         Tray
         WasapiMixer
         SbWindow
+        ConvertAudio
 )
 
 # ---- distributable: cmake --build build --config Release --target dist ----
