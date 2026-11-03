@@ -13,7 +13,7 @@ To enable live feedback:
 3. Double-click your new primary recording device and go to the **Listen** tab and check **Listen to this device**.
 
 To add sounds:
-1. Export your soundbites as **.wav** file types with 2 channels, 16 bit depth, and 48.000 kHz sample rate.
+1. Export your soundbites as **.wav** file types (uncompressed PCM) with 2 channel stereo, 16 bit depth, and 48.000 kHz sample rate (the default for CABLE Output from VB-Audio). If your soundbites are not playing normally, it is likely due to a format mismatch. 
 
 ## Launching
 1. Download soundboard.zip from the GitHub release in this repository.
