@@ -2,5 +2,6 @@
 build-release/
 Resources/logo
 Resources/Soundbites
+Resources/TestSoundbites
 Resources/my-notes
 Resources/toggleListen.ps1
