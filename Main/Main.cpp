@@ -28,9 +28,10 @@ static std::string ExeDirUtf8() {
 
 std::vector<float> LoadWavFile(const std::string& wavPath) {
     // open file
-    std::ifstream file(wavPath, std::ios::binary);
+    // std::ifstream file(wavPath, std::ios::binary);
+    std::ifstream file(StringToWString(wavPath), std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Line 33 Main::LoadWavFile Error: Could not open file: " << wavPath << "\n";
+        std::cerr << "Main::LoadWavFile Error: Could not open file: " << wavPath << "\n";
         return {};
     }
 
@@ -53,7 +54,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
         std::vector<float> converted = ConvertAudioFile(wavPath);
         if (!converted.empty()) return converted;
         else {
-            std::cerr << "Line 56 Main::LoadWavFile Error: Failed to convert file." << "\n";
+            std::cerr << "Main::LoadWavFile Error: Failed to convert file." << "\n";
             return {};
         }
     }
@@ -89,7 +90,7 @@ std::vector<float> LoadWavFile(const std::string& wavPath) {
     file.close();
 
     if (rawAudioData.empty()) {
-        std::cerr << "Line 92 Main::LoadWavFile Error: Data payload empty in: " << wavPath << "\n";
+        std::cerr << "Main::LoadWavFile Error: Data payload empty in: " << wavPath << "\n";
         return {};
     }
 
@@ -144,13 +145,13 @@ int main() {
     CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
     // 2. Load soundbites into memory and populate global tray variables for soundbite names
-    for (int i = 0; i < g_soundbiteCount; i++) {
+    for (int i = 0; i < 5; i++) {
         mixer.LoadSoundbite(i, LoadWavFile(soundbiteBasePath + soundbitePaths[i]));  
     }
 
     // 3. Start mixer background thread (captures Mic and routes to VB-Cable)
     if (!mixer.Start(L"CABLE Input")) {
-        std::cerr << "Line 153 Main::Main Error: Failed to start WasapiMixer! Make sure VB-Cable is active.";
+        std::cerr << "Main::Main Error: Failed to start WasapiMixer! Make sure VB-Cable is active.";
         CoUninitialize();
         system("pause");
         return -1;
@@ -169,6 +170,7 @@ int main() {
     std::vector<SbEntry> sbEntries;
     std::string loadedPaths[g_soundbiteCount];
     for (int i = 0; i < g_soundbiteCount; i++) {
+        if (soundbitePaths[i].empty()) continue;
         loadedPaths[i] = soundbiteBasePath + soundbitePaths[i];
         sbEntries.push_back({ loadedPaths[i], static_cast<char>(g_soundbiteKeys[i][0]), i });
     }
@@ -201,6 +203,21 @@ int main() {
                 case '3': soundbiteIndex = 2; break;
                 case '4': soundbiteIndex = 3; break;
                 case '5': soundbiteIndex = 4; break;
+                case 'Q': soundbiteIndex = 5; break;
+                case 'W': soundbiteIndex = 6; break;
+                case 'E': soundbiteIndex = 7; break;
+                case 'R': soundbiteIndex = 8; break;
+                case 'T': soundbiteIndex = 9; break;
+                case 'A': soundbiteIndex = 10; break;
+                case 'S': soundbiteIndex = 11; break;
+                case 'D': soundbiteIndex = 12; break;
+                case 'F': soundbiteIndex = 13; break;
+                case 'G': soundbiteIndex = 14; break;
+                case 'Z': soundbiteIndex = 15; break;
+                case 'X': soundbiteIndex = 16; break;
+                case 'C': soundbiteIndex = 17; break;
+                case 'V': soundbiteIndex = 18; break;
+                case 'B': soundbiteIndex = 19; break;
                 case 'P': soundbiteIndex = -1; g_running.store(false); break;
                 default:
                     soundbiteIndex = SbFindByHotkey(pressedKey);

@@ -12,9 +12,6 @@ To enable live feedback:
 2. Set your primary recording device to **CABLE Output**.
 3. Double-click your new primary recording device and go to the **Listen** tab and check **Listen to this device**.
 
-To add sounds:
-1. Export your soundbites as **.wav** file types (uncompressed PCM) with 2 channel stereo, 16 bit depth, and 48.000 kHz sample rate (the default for CABLE Output from VB-Audio). If your soundbites are not playing normally, it is likely due to a format mismatch. 
-
 ## Launching
 1. Download and install VB-Cable Virtual Audio Device from VB-Audio (this application has only been tested with the 64 bit new package).
 2. Download soundboard.zip from the GitHub release in this repository.
